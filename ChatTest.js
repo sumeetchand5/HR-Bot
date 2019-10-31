@@ -48,7 +48,7 @@ export default class App extends Component {
     typingText: null,
     isLoadingEarlier: false,
     checkboxState : true, 
-    userContext : [], 
+    userContext : [{view_level : 0}], 
     emp_id : '', 
     man_id : '', 
     user : null, 
@@ -193,6 +193,48 @@ if(!messages[0].text) {
         createdAt: new Date(),
        };
    }
+   else if (image.length >=1 && this.state.userContext.length>=1){
+    axios({method:'post',url:"http://192.168.43.73:3000/api/image",  responseType: 'arraybuffer',data : {
+      "man_id": this.state.userContext[0].man_id.toString(),
+      "emp_id": "0",
+      "token" : this.state.userContext[0].token.toString(),
+      "url" : image.toString(), 
+   }  }
+    )
+     .then(resp => {
+        for(let u=0;u<3;u++) console.log('Testing')
+       // for(let u=0;u<1;u++) console.log(resp.data)
+       //console.log(resp)
+       imageT =  new Buffer(resp.data, 'binary').toString('base64'); 
+       //console.log(imageT); 
+       //this.onSendFromUser([{ image: imageT }]);
+
+     let  imageMsg = {
+        _id: this.state.messages.length + 1,
+        text: this.state.text,
+         createdAt: new Date(),
+        user: 'TestIEP',
+        image: 'data:image/png;base64,' + imageT ,
+        quickReplies: {
+          type: 'radio', // or 'checkbox',
+          keepIt: true,
+          values:  quickReply.map(val =>  obj = {title : val, value : val} )
+        }
+      };
+
+       this.setState(previousState => ({
+        messages: GiftedChat.append(
+          previousState.messages,
+          [imageMsg],
+          Platform.OS !== 'web',
+        ),
+      }))
+  
+     }).catch(err=> {
+       console.log(err);
+       ToastAndroid.show("Something went wrong when fetching attachments",ToastAndroid.LONG)
+     })
+   }
    else {
     msg = {
       _id: this.state.messages.length + 1,
@@ -207,11 +249,10 @@ if(!messages[0].text) {
     };
    }
 
-
-   
-   if(image.length >=1 && this.state.userContext.length>=1){
+   /* 
+  if(image.length >=1 && this.state.userContext.length>=1){
     for(let i=0;i <30;i++) console.log('herer'); 
-    axios({method:'post',url:"http://192.168.43.273:3000/api/image",  responseType: 'arraybuffer',data : {
+    axios({method:'post',url:"http://192.168.43.73:3000/api/image",  responseType: 'arraybuffer',data : {
       "man_id": this.state.userContext[0].man_id.toString(),
       "emp_id": "0",
       "token" : this.state.userContext[0].token.toString(),
@@ -228,7 +269,7 @@ if(!messages[0].text) {
        this.setState(previousState => ({
         messages: GiftedChat.append(
           previousState.messages,
-          [{ image: 'data:image/png;base64,' + imageT }],
+          [{ image: 'data:image/png;base64,' + imageT ,id_}],
           Platform.OS !== 'web',
         ),
       }))
@@ -237,18 +278,20 @@ if(!messages[0].text) {
        ToastAndroid.show("Something went wrong when fetching attachments",ToastAndroid.LONG)
      })
   }
-
-    this.setState(previousState => ({
+  */
+  if (!image.length >=1){
+  this.setState(previousState => ({
       messages: GiftedChat.append(
         previousState.messages,
         [msg],
         Platform.OS !== 'web',
       ),
     }))
+  }
 
     
 
-     console.log(this.state.messages); 
+  //   console.log(this.state.messages); 
  
 
   }
@@ -386,7 +429,7 @@ if(!messages[0].text) {
         testID='main'
       >
         <HeaderIconExample navigation={this.props.navigation} color='#1976d2' title={'Leave Bot'} />
-        <View style={{justifyContent:'flex-end',flexDirection:'row',marginTop:10,marginRight:25,backgroundColor:'lightBlue'}}>
+        {this.state.userContext[0].view_level >1 ? <View style={{justifyContent:'flex-end',flexDirection:'row',marginTop:10,marginRight:25,backgroundColor:'lightBlue'}}>
               <Text style={{color:'black',fontWeight:'bold',fontSize:15,paddingRight:6,fontFamily:'Roboto'}}>Chat As Employee</Text>
               <CheckBox checked={this.state.checkboxState} color="#1976d2" onPress={() => {
                   if(this.state.checkboxState ) ToastAndroid.show("Chating as Manager now",ToastAndroid.LONG)
@@ -394,7 +437,7 @@ if(!messages[0].text) {
                   this.setState({checkboxState:this.state.checkboxState ? false : true})
 
               }}/>
-        </View>
+        </View> : <View/> }
                
         <GiftedChat
           messages={this.state.messages}

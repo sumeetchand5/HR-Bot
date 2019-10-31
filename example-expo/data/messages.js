@@ -17,8 +17,8 @@ export default [
           value: 'Approved',
         },
         {
-          title: 'Family Care Leave\n8Am 20th Oct\nto Dec 26th 2019',
-          value: 'Family Care Leave\n8Am 20th Oct\nto Dec 26th 2019',
+          title: 'Pending Leaves',
+          value: 'Pending Leaves',
         },
         {
           title: 'view History',

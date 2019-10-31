@@ -58,7 +58,7 @@ export async function pickImageAsync(onSend,man_id,emp_id,view_level,token,sessi
       form.append("image", {type: "image/*", name: "image", uri:result.uri});
 
       try {
-      let response = await fetch('http://192.168.43.273:3000/api/dfc', {
+      let response = await fetch('http://192.168.43.73:3000/api/dfc', {
         method: 'post',
         headers:{
           'Accept': 'application/json',
